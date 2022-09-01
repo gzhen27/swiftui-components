@@ -13,14 +13,46 @@ enum SwipeDirection {
     case right
     case left
     case unknown
+    
+    /**
+     get the swipe direction based on the gesture.translation
+     */
+    static func get(translation: CGSize, minimuDistances: CGFloat) -> SwipeDirection {
+        let maxRange: ClosedRange<CGFloat> = -minimuDistances...minimuDistances
+        
+        switch (translation.width, translation.height) {
+        case (...0, maxRange):
+            return .left
+        case (0..., maxRange):
+            return .right
+        case (maxRange, ...0):
+            return .up
+        case (maxRange, 0...):
+            return .down
+        default:
+            return .unknown
+        }
+    }
 }
 
 struct SwipeDetectView: View {
-    let maxDiffDistance: CGFloat = 20.0
+    @State private var swipeDirection: SwipeDirection = .unknown
+    let gestureMinimumDistance: CGFloat = 30
     
-    @State private var color = Color.gray.opacity(0.8)
-    @State private var swipeDirection : SwipeDirection = .unknown
-    @State private var startPoint: CGPoint?
+    var color: Color {
+        switch swipeDirection {
+        case .up:
+            return Color.red.opacity(0.8)
+        case .down:
+            return Color.black.opacity(0.8)
+        case .right:
+            return Color.blue.opacity(0.8)
+        case .left:
+            return Color.yellow.opacity(0.8)
+        case .unknown:
+            return Color.gray.opacity(0.8)
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -28,50 +60,11 @@ struct SwipeDetectView: View {
         }
         .ignoresSafeArea()
         .gesture(
-            DragGesture()
-                .onChanged({ gesture in
-                    setStartPoint(location: gesture.location)
-                })
+            DragGesture(minimumDistance: gestureMinimumDistance, coordinateSpace: .local)
                 .onEnded({ gesture in
-                    detectDirection(endPoint: gesture.location)
+                    swipeDirection = SwipeDirection.get(translation: gesture.translation, minimuDistances: gestureMinimumDistance)
                 })
         )
-    }
-    
-    private func setStartPoint(location: CGPoint) {
-        if self.startPoint == nil {
-            self.startPoint = location
-        }
-    }
-    
-    private func detectDirection(endPoint: CGPoint) {
-        guard let startPoint = self.startPoint else {
-            return
-        }
-
-        let xDistance = abs(endPoint.x - startPoint.x)
-        let yDistance = abs(endPoint.y - startPoint.y)
-        
-        switch (xDistance, yDistance) {
-        case let(x,y) where y > x && startPoint.y > endPoint.y:
-            self.swipeDirection = .up
-            self.color = Color.red.opacity(0.8)
-            print("swipe up")
-        case let(x,y) where y > x && startPoint.y < endPoint.y:
-            self.swipeDirection = .down
-            self.color = Color.black.opacity(0.8)
-            print("swipe down")
-        case let(x,y) where y < x && startPoint.x < endPoint.x:
-            self.swipeDirection = .right
-            self.color = Color.yellow.opacity(0.8)
-            print("swipe right")
-        case let(x,y) where y < x && startPoint.x > endPoint.x:
-            self.swipeDirection = .left
-            self.color = Color.blue.opacity(0.8)
-            print("swipe left")
-        default:
-            self.swipeDirection = .unknown
-        }
     }
 }
 
