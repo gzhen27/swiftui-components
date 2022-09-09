@@ -27,22 +27,32 @@ struct CustomTabView: View {
                         Text("Account")
                     }
                     Spacer()
-                    HStack {
-                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .current, tabItemName: "Current", imageName: "calendar", size: geo.size)
-                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .history, tabItemName: "History", imageName: "chart.bar", size: geo.size)
-                        AddItemButton(isPresentedAddView: $isPresentedAddView, imageName: "plus.circle.fill", size: geo.size)
-                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .calculator, tabItemName: "Calc", imageName: "plusminus", size: geo.size)
-                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .user, tabItemName: "Account", imageName: "person.circle", size: geo.size)
-                    }
-                    .frame(width: geo.size.width, height: geo.size.height/10)
-                    .background(Color("TabBarBackground"))
-                    .shadow(radius: 2)
+                    TabViewBar(tabViewNavigator: tabViewNavigator, isPresentedAddView: $isPresentedAddView, size: geo.size)
                 }
                 if $isPresentedAddView.wrappedValue {
                     AddItemView(isPresentedAddView: $isPresentedAddView, size: geo.size)
                 }
             }
         }
+    }
+}
+
+struct TabViewBar: View {
+    @ObservedObject var tabViewNavigator: TabViewNavigator
+    @Binding var isPresentedAddView: Bool
+    let size: CGSize
+    
+    var body: some View {
+        HStack {
+            CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .current, tabItemName: "Current", imageName: "calendar", size: size)
+            CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .history, tabItemName: "History", imageName: "chart.bar", size: size)
+            AddItemButton(isPresentedAddView: $isPresentedAddView, imageName: "plus.circle.fill", size: size)
+            CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .calculator, tabItemName: "Calc", imageName: "plusminus", size: size)
+            CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .user, tabItemName: "Account", imageName: "person.circle", size: size)
+        }
+        .frame(width: size.width, height: size.height/10)
+        .background(Color("TabBarBackground"))
+        .shadow(radius: 2)
     }
 }
 
