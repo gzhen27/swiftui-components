@@ -8,18 +8,29 @@
 import SwiftUI
 
 struct CustomTabView: View {
+    @StateObject var tabViewNavigator = TabViewNavigator()
+    
     var body: some View {
         GeometryReader { geo in
             VStack {
                 Spacer()
-                Text("Home")
+                switch tabViewNavigator.selectedTab {
+                case .current:
+                    Text("Current")
+                case .history:
+                    Text("History")
+                case .calculator:
+                    Text("Calculator")
+                case .user:
+                    Text("Account")
+                }
                 Spacer()
                 HStack {
-                    CustomTabViewItem(tabItemName: "Current", imageName: "calendar", size: geo.size)
-                    CustomTabViewItem(tabItemName: "History", imageName: "chart.bar", size: geo.size)
+                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .current, tabItemName: "Current", imageName: "calendar", size: geo.size)
+                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .history, tabItemName: "History", imageName: "chart.bar", size: geo.size)
                     AddItemButton(imageName: "plus.circle.fill", size: geo.size)
-                    CustomTabViewItem(tabItemName: "Calc", imageName: "plusminus", size: geo.size)
-                    CustomTabViewItem(tabItemName: "Account", imageName: "person.circle", size: geo.size)
+                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .calculator, tabItemName: "Calc", imageName: "plusminus", size: geo.size)
+                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .user, tabItemName: "Account", imageName: "person.circle", size: geo.size)
                 }
                 .frame(width: geo.size.width, height: geo.size.height/10)
                 .background(Color("TabBarBackground"))
@@ -50,6 +61,8 @@ struct AddItemButton: View {
 }
 
 struct CustomTabViewItem: View {
+    @ObservedObject var tabViewNavigator: TabViewNavigator
+    let tabIdentifer: TabViewNavigator.CustomTab
     let tabItemName: String
     let imageName: String
     let size: CGSize
@@ -66,6 +79,10 @@ struct CustomTabViewItem: View {
             Spacer()
         }
         .padding(.horizontal, -4)
+        .onTapGesture {
+            tabViewNavigator.selectedTab = tabIdentifer
+        }
+        .foregroundColor(tabViewNavigator.selectedTab == tabIdentifer ? Color("CustomRed") : Color("TabBarColor"))
     }
 }
 
