@@ -9,38 +9,75 @@ import SwiftUI
 
 struct CustomTabView: View {
     @StateObject var tabViewNavigator = TabViewNavigator()
+    @State private var isPresentedAddView = false
     
     var body: some View {
         GeometryReader { geo in
-            VStack {
-                Spacer()
-                switch tabViewNavigator.selectedTab {
-                case .current:
-                    Text("Current")
-                case .history:
-                    Text("History")
-                case .calculator:
-                    Text("Calculator")
-                case .user:
-                    Text("Account")
+            ZStack {
+                VStack {
+                    Spacer()
+                    switch tabViewNavigator.selectedTab {
+                    case .current:
+                        Text("Current")
+                    case .history:
+                        Text("History")
+                    case .calculator:
+                        Text("Calculator")
+                    case .user:
+                        Text("Account")
+                    }
+                    Spacer()
+                    HStack {
+                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .current, tabItemName: "Current", imageName: "calendar", size: geo.size)
+                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .history, tabItemName: "History", imageName: "chart.bar", size: geo.size)
+                        AddItemButton(isPresentedAddView: $isPresentedAddView, imageName: "plus.circle.fill", size: geo.size)
+                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .calculator, tabItemName: "Calc", imageName: "plusminus", size: geo.size)
+                        CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .user, tabItemName: "Account", imageName: "person.circle", size: geo.size)
+                    }
+                    .frame(width: geo.size.width, height: geo.size.height/10)
+                    .background(Color("TabBarBackground"))
+                    .shadow(radius: 2)
                 }
-                Spacer()
-                HStack {
-                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .current, tabItemName: "Current", imageName: "calendar", size: geo.size)
-                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .history, tabItemName: "History", imageName: "chart.bar", size: geo.size)
-                    AddItemButton(imageName: "plus.circle.fill", size: geo.size)
-                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .calculator, tabItemName: "Calc", imageName: "plusminus", size: geo.size)
-                    CustomTabViewItem(tabViewNavigator: tabViewNavigator, tabIdentifer: .user, tabItemName: "Account", imageName: "person.circle", size: geo.size)
+                if $isPresentedAddView.wrappedValue {
+                    ZStack {
+                        Color.white
+                        Color.black.opacity(0.4)
+                        VStack {
+                            Text("Add")
+                                .bold()
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color("CustomRed"))
+                            Spacer()
+                            Button {
+                                self.isPresentedAddView.toggle()
+                            } label: {
+                                Text("Close")
+                                    .padding()
+                                    .foregroundColor(Color("CustomRed"))
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color("CustomRed"), lineWidth: 3)
+                                            .frame(width: geo.size.width*0.6, height: 32)
+                                    )
+                            }
+                            .padding()
+
+                        }
+                        .frame(width: geo.size.width*0.9, height: geo.size.height*0.9)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(radius: 16)
+                    }
+                    .ignoresSafeArea()
                 }
-                .frame(width: geo.size.width, height: geo.size.height/10)
-                .background(Color("TabBarBackground"))
-                .shadow(radius: 2)
             }
         }
     }
 }
 
 struct AddItemButton: View {
+    @Binding var isPresentedAddView: Bool
     let imageName: String
     let size: CGSize
     
@@ -57,6 +94,9 @@ struct AddItemButton: View {
                 .foregroundColor(Color("CustomRed"))
         }
         .offset(y: -size.height/20)
+        .onTapGesture {
+            isPresentedAddView.toggle()
+        }
     }
 }
 
