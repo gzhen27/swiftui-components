@@ -110,12 +110,6 @@ struct CustomTabView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             CustomTabView()
-                .previewDevice("iPhone 13")
-            CustomTabView()
-                .preferredColorScheme(.dark)
-                .previewDevice("iPhone 8")
-            CustomTabView()
-                .previewDevice("iPad Pro (12.9-inch) (5th generation)")
         }
     }
 }
